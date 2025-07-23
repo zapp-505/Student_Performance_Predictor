@@ -29,12 +29,18 @@ def load_object(file_path):
 def evaluate_models(X_train,y_train,x_test,y_test,models,params):
     try:
         report={}
+        fitted_models={}
         for i in range(len(list(models))):
             model = list(models.values())[i]
             param = params[list(models.keys())[i]]
-            gs = GridSearchCV(model,param,cv=3)
-            gs.fit(X_train,y_train)
-            model = gs.best_estimator_
+            
+            # Handle empty parameter dict
+            if param:  # If param has values, use GridSearchCV
+                gs = GridSearchCV(model,param,cv=3)
+                gs.fit(X_train,y_train)
+                model = gs.best_estimator_
+            else:  # If param is empty, fit model directly
+                model.fit(X_train,y_train)
 
             y_train_pred=model.predict(X_train)
             y_test_pred=model.predict(x_test)
@@ -42,6 +48,7 @@ def evaluate_models(X_train,y_train,x_test,y_test,models,params):
             train_model_score = r2_score(y_train,y_train_pred)
             test_model_score = r2_score(y_test, y_test_pred)
             report[list(models.keys())[i]] = test_model_score
-        return report
+            fitted_models[list(models.keys())[i]] = model
+        return report, fitted_models
     except Exception as e:
         raise CustomException(e,sys)

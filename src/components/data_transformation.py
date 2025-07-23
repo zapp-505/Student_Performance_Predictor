@@ -30,7 +30,7 @@ class DataTransformation:
             num_pipeline = Pipeline(
                 steps=[
                 ("imputer",SimpleImputer(strategy="median")),
-                ("scaller",StandardScaler())   
+                ("scaler",StandardScaler())   
             ]
             )
             cat_pipeline=Pipeline(
@@ -38,7 +38,7 @@ class DataTransformation:
                 steps=[
                     ("imputer",SimpleImputer(strategy="most_frequent")),
                     ("one_hot_encoder",OneHotEncoder()),
-                    ("scaler",StandardScaler())
+                    ("scaler",StandardScaler(with_mean=False))
                 ]
             )
             logging.info("Numerical columns standard scaling completed")
@@ -82,7 +82,7 @@ class DataTransformation:
             input_feature_test_arr = preprocessor_obj.transform(input_feature_test_df)
 
             train_arr = np.c_[input_feature_train_arr,np.array(target_feature_train_df)]
-            test_arr = np.c_[input_feature_train_arr,np.array(target_feature_test_df)]
+            test_arr = np.c_[input_feature_test_arr,np.array(target_feature_test_df)]
             
             logging.info("Saved preprocessed objects")
 
